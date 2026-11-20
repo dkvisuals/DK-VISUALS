@@ -315,3 +315,23 @@ async function checkLoginSession() {
 checkLoginSession();
 
 
+
+const logoutButton = document.getElementById("logoutButton");
+
+if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+        logoutButton.disabled = true;
+        logoutButton.textContent = "Signing out...";
+
+        const { error } = await supabaseClient.auth.signOut();
+
+        if (error) {
+            console.error("Logout error:", error.message);
+            alert("Could not sign out. Please try again.");
+            window.location.reload();
+            return;
+        }
+
+        window.location.reload();
+    });
+}
