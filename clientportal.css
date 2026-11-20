@@ -1263,3 +1263,31 @@ h1 span {
     }
 }
 
+
+
+
+/* LOGOUT BUTTON */
+
+.logout-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 13px 12px;
+    margin-top: 12px;
+    color: #999;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.logout-button:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.15);
+}
+
