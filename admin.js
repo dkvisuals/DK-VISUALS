@@ -3,8 +3,13 @@
    DK VISUALS — ADMIN DASHBOARD
 ========================================= */
 
-// SUPABASE CONNECTION
+
+/* =========================================
+   1. SUPABASE CONNECTION
+========================================= */
+
 const SUPABASE_URL = "https://rajyuhkatjdnnsifaxuh.supabase.co";
+
 const SUPABASE_KEY = "sb_publishable_DHz9wzifauyVzhNyyBMeWw_aJfdPGab";
 
 const supabaseClient = window.supabase.createClient(
@@ -12,33 +17,52 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
-// GLOBAL DATA
+
+/* =========================================
+   2. GLOBAL DATA
+========================================= */
+
 let currentUser = null;
 let currentProfile = null;
 let allClients = [];
 
+const pageNames = {
+    dashboard: "Dashboard",
+    clients: "Clients",
+    projects: "Projects",
+    invoices: "Invoices",
+    messages: "Messages",
+    files: "Files",
+    settings: "Settings"
+};
+
 
 /* =========================================
-   INITIALIZATION
+   3. INITIALIZATION
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
+
     initializeNavigation();
     initializeModals();
     initializeMobileMenu();
     initializeButtons();
-    initializeClientSearch();
+    initializeSearch();
+    initializeSettings();
 
     await checkAdminAccess();
+
 });
 
 
 /* =========================================
-   AUTHENTICATION & ADMIN ACCESS
+   4. AUTHENTICATION
 ========================================= */
 
 async function checkAdminAccess() {
+
     try {
+
         const { data, error } = await supabaseClient.auth.getUser();
 
         if (error || !data.user) {
@@ -56,8 +80,11 @@ async function checkAdminAccess() {
                 .single();
 
         if (profileError || !profile || profile.role !== "admin") {
-            alert("Je hebt geen toegang tot het admin dashboard.");
+
+            showToast("Je hebt geen toegang tot het admin dashboard.");
+
             await supabaseClient.auth.signOut();
+
             window.location.href = "clientportal.html";
             return;
         }
@@ -65,162 +92,265 @@ async function checkAdminAccess() {
         currentProfile = profile;
 
         updateAdminProfile();
+
         await loadDashboard();
         await loadClients();
 
+        console.log("DK VISUALS Admin Dashboard connected.");
+
     } catch (error) {
+
         console.error("Authentication error:", error);
-        alert("Er ging iets mis bij het controleren van je account.");
+
+        showToast("Er ging iets mis bij het laden van je account.");
+
     }
+
 }
 
 
+/* =========================================
+   5. ADMIN PROFILE
+========================================= */
+
 function updateAdminProfile() {
+
+    if (!currentProfile) return;
+
     const name = currentProfile.full_name || "Administrator";
+
     const initials = name
-        .split(" ")
-        .map(part => part[0])
+        .trim()
+        .split(/\s+/)
+        .map(part => part.charAt(0))
         .join("")
         .substring(0, 2)
         .toUpperCase();
 
-    const nameElement = document.querySelector(".admin-profile strong");
-    const roleElement = document.querySelector(".admin-profile span");
-    const avatarElement = document.querySelector(".admin-avatar");
+    const nameElement = document.getElementById("adminName");
+    const avatarElement = document.getElementById("sidebarAvatar");
+    const topbarAvatar = document.getElementById("topbarAvatar");
 
-    if (nameElement) nameElement.textContent = name;
-    if (roleElement) roleElement.textContent = "Administrator";
-    if (avatarElement) avatarElement.textContent = initials;
+    if (nameElement) {
+        nameElement.textContent = name;
+    }
+
+    if (avatarElement) {
+        avatarElement.textContent = initials;
+    }
+
+    if (topbarAvatar) {
+        topbarAvatar.textContent = initials;
+    }
+
 }
 
 
 /* =========================================
-   LOGOUT
+   6. LOGOUT
 ========================================= */
 
 async function logout() {
+
+    const logoutButton = document.getElementById("logoutBtn");
+
+    if (logoutButton) {
+        logoutButton.disabled = true;
+    }
+
     const { error } = await supabaseClient.auth.signOut();
 
     if (error) {
-        alert("Uitloggen is niet gelukt.");
-        console.error(error);
+
+        console.error("Logout error:", error);
+
+        showToast("Uitloggen is niet gelukt.");
+
+        if (logoutButton) {
+            logoutButton.disabled = false;
+        }
+
         return;
     }
 
     window.location.href = "clientportal.html";
+
 }
 
 
 /* =========================================
-   NAVIGATION
+   7. NAVIGATION
 ========================================= */
 
 function initializeNavigation() {
-    const navLinks = document.querySelectorAll("[data-page]");
+
+    const navLinks = document.querySelectorAll(".nav-item[data-page]");
 
     navLinks.forEach(link => {
+
         link.addEventListener("click", event => {
+
             event.preventDefault();
 
             const page = link.dataset.page;
-            if (!page) return;
 
-            showPage(page);
+            if (page) {
+                showPage(page);
+            }
+
         });
+
     });
+
+    showPage("dashboard");
+
 }
 
 
 function showPage(pageName) {
-    document.querySelectorAll(".page-section").forEach(section => {
-        section.classList.remove("active");
-    });
 
-    const targetPage = document.getElementById(pageName);
+    const targetPage = document.getElementById(`page-${pageName}`);
 
-    if (targetPage) {
-        targetPage.classList.add("active");
+    if (!targetPage) {
+        console.error("Page not found:", pageName);
+        return;
     }
 
-    document.querySelectorAll("[data-page]").forEach(link => {
+    // Hide all pages
+    document.querySelectorAll(".admin-page").forEach(page => {
+        page.classList.remove("active");
+    });
+
+    // Show selected page
+    targetPage.classList.add("active");
+
+    // Update navigation
+    document.querySelectorAll(".nav-item[data-page]").forEach(link => {
+
         link.classList.toggle(
             "active",
             link.dataset.page === pageName
         );
+
     });
 
-    const breadcrumb = document.querySelector(".breadcrumb strong");
+    // Update breadcrumb
+    const breadcrumb = document.getElementById("breadcrumbPage");
 
     if (breadcrumb) {
-        breadcrumb.textContent =
-            pageName.charAt(0).toUpperCase() + pageName.slice(1);
+        breadcrumb.textContent = pageNames[pageName] || pageName;
     }
 
     closeSidebar();
+
 }
 
 
 /* =========================================
-   MODALS
+   8. MODALS
 ========================================= */
 
 function initializeModals() {
+
+    // Open modal
     document.querySelectorAll("[data-open-modal]").forEach(button => {
+
         button.addEventListener("click", () => {
+
             const modalId = button.dataset.openModal;
+
             openModal(modalId);
+
         });
+
     });
 
+
+    // Close modal
     document.querySelectorAll("[data-close-modal]").forEach(button => {
-        button.addEventListener("click", () => {
-            const modal = button.closest(".modal");
-            if (modal) closeModal(modal.id);
-        });
-    });
 
-    document.querySelectorAll(".modal").forEach(modal => {
-        modal.addEventListener("click", event => {
-            if (event.target === modal) {
+        button.addEventListener("click", () => {
+
+            const modal = button.closest(".modal-overlay");
+
+            if (modal) {
                 closeModal(modal.id);
             }
+
         });
+
     });
 
+
+    // Click outside modal
+    document.querySelectorAll(".modal-overlay").forEach(overlay => {
+
+        overlay.addEventListener("click", event => {
+
+            if (event.target === overlay) {
+                closeModal(overlay.id);
+            }
+
+        });
+
+    });
+
+
+    // Escape key
     document.addEventListener("keydown", event => {
+
         if (event.key === "Escape") {
-            document.querySelectorAll(".modal.active").forEach(modal => {
+
+            document.querySelectorAll(".modal-overlay.active").forEach(modal => {
                 closeModal(modal.id);
             });
+
         }
+
     });
+
 }
 
 
 function openModal(modalId) {
+
     const modal = document.getElementById(modalId);
 
-    if (modal) {
-        modal.classList.add("active");
+    if (!modal) {
+        console.warn("Modal not found:", modalId);
+        return;
     }
+
+    modal.classList.add("active");
+
+    document.body.style.overflow = "hidden";
+
 }
 
 
 function closeModal(modalId) {
+
     const modal = document.getElementById(modalId);
 
-    if (modal) {
-        modal.classList.remove("active");
+    if (!modal) return;
+
+    modal.classList.remove("active");
+
+    if (!document.querySelector(".modal-overlay.active")) {
+        document.body.style.overflow = "";
     }
+
 }
 
 
 /* =========================================
-   MOBILE SIDEBAR
+   9. MOBILE SIDEBAR
 ========================================= */
 
 function initializeMobileMenu() {
+
     const menuButton = document.getElementById("mobileMenu");
+
     const closeButton = document.getElementById("sidebarClose");
 
     if (menuButton) {
@@ -230,26 +360,34 @@ function initializeMobileMenu() {
     if (closeButton) {
         closeButton.addEventListener("click", closeSidebar);
     }
+
 }
 
 
 function openSidebar() {
-    document.querySelector(".sidebar")?.classList.add("open");
+
+    document.getElementById("sidebar")?.classList.add("open");
+
 }
 
 
 function closeSidebar() {
-    document.querySelector(".sidebar")?.classList.remove("open");
+
+    document.getElementById("sidebar")?.classList.remove("open");
+
 }
 
 
 /* =========================================
-   BUTTONS
+   10. BUTTONS
 ========================================= */
 
 function initializeButtons() {
+
     const logoutButton = document.getElementById("logoutBtn");
+
     const refreshButton = document.getElementById("refreshBtn");
+
     const dashboardRefresh = document.getElementById("dashboardRefresh");
 
     if (logoutButton) {
@@ -263,68 +401,97 @@ function initializeButtons() {
     if (dashboardRefresh) {
         dashboardRefresh.addEventListener("click", refreshDashboard);
     }
+
 }
 
 
 async function refreshDashboard() {
-    await loadDashboard();
-    await loadClients();
+
+    const refreshButton = document.getElementById("refreshBtn");
+
+    if (refreshButton) {
+        refreshButton.disabled = true;
+    }
+
+    try {
+
+        await loadDashboard();
+        await loadClients();
+
+        showToast("Dashboard bijgewerkt.");
+
+    } catch (error) {
+
+        console.error("Refresh error:", error);
+
+        showToast("Dashboard kon niet worden vernieuwd.");
+
+    }
+
+    if (refreshButton) {
+        refreshButton.disabled = false;
+    }
+
 }
 
 
 /* =========================================
-   DASHBOARD STATISTICS
+   11. DASHBOARD STATISTICS
 ========================================= */
 
 async function loadDashboard() {
-    await Promise.all([
-        loadStat("profiles", "totalClients", "role"),
-        loadStat("projects", "activeProjects"),
-        loadStat("invoices", "pendingInvoices"),
-        loadStat("messages", "newMessages")
-    ]);
-}
 
+    // Client count
+    const { count, error } = await supabaseClient
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "client");
 
-async function loadStat(table, elementId, filterColumn = null) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
+    const clientElement = document.getElementById("totalClients");
 
-    let query = supabaseClient
-        .from(table)
-        .select("*", { count: "exact", head: true });
+    if (clientElement) {
 
-    if (table === "profiles") {
-        query = query.eq("role", "client");
+        clientElement.textContent = error
+            ? "—"
+            : count ?? 0;
+
     }
 
-    if (table === "invoices" && filterColumn) {
-        query = query.eq(filterColumn, "pending");
-    }
+    // Other statistics will be connected
+    // when their Supabase table structures are confirmed.
 
-    if (table === "messages" && filterColumn) {
-        query = query.eq(filterColumn, "false");
-    }
+    const pendingInvoices = document.getElementById("pendingInvoices");
+    const activeProjects = document.getElementById("activeProjects");
+    const newMessages = document.getElementById("newMessages");
 
-    const { count, error } = await query;
+    if (activeProjects) activeProjects.textContent = "—";
+    if (pendingInvoices) pendingInvoices.textContent = "—";
+    if (newMessages) newMessages.textContent = "—";
 
-    if (error) {
-        console.warn(`Could not load ${table}:`, error.message);
-        element.textContent = "—";
-        return;
-    }
-
-    element.textContent = count ?? 0;
 }
 
 
 /* =========================================
-   CLIENTS
+   12. CLIENTS
 ========================================= */
 
 async function loadClients() {
+
     const table = document.getElementById("clientsTable");
+
     if (!table) return;
+
+    const tbody = table.querySelector("tbody");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="6" class="empty-state">
+                Klanten laden...
+            </td>
+        </tr>
+    `;
 
     const { data, error } = await supabaseClient
         .from("profiles")
@@ -333,30 +500,45 @@ async function loadClients() {
         .order("full_name", { ascending: true });
 
     if (error) {
-        console.error("Clients could not be loaded:", error);
-        showTableMessage(table, "Klanten konden niet worden geladen.");
+
+        console.error("Clients loading error:", error);
+
+        showTableMessage(
+            table,
+            "Klanten konden niet worden geladen."
+        );
+
         return;
     }
 
     allClients = data || [];
+
     renderClients(allClients);
+
+    const navCount = document.getElementById("clientNavCount");
+
+    if (navCount) {
+        navCount.textContent = allClients.length;
+    }
+
 }
 
 
 function renderClients(clients) {
+
     const table = document.getElementById("clientsTable");
+
     if (!table) return;
 
-    const tbody = table.tagName === "TBODY"
-        ? table
-        : table.querySelector("tbody");
+    const tbody = table.querySelector("tbody");
 
     if (!tbody) return;
 
-    if (clients.length === 0) {
+    if (!clients.length) {
+
         tbody.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="6">
                     <div class="empty-state">
                         <h3>Geen klanten gevonden</h3>
                         <p>Nieuwe klanten verschijnen hier.</p>
@@ -364,87 +546,355 @@ function renderClients(clients) {
                 </td>
             </tr>
         `;
+
         return;
     }
 
-    tbody.innerHTML = clients.map(client => `
-        <tr>
-            <td>
-                <span class="table-primary">
-                    ${escapeHTML(client.full_name || "Naam onbekend")}
-                </span>
-            </td>
-            <td>${escapeHTML(client.company_name || "—")}</td>
-            <td>
-                <span class="status status-active">Client</span>
-            </td>
-            <td>
-                <span class="table-secondary">
-                    ${escapeHTML(client.id)}
-                </span>
-            </td>
-            <td>
-                <div class="table-actions">
-                    <button class="icon-btn"
-                        title="Bekijk klant"
-                        data-client-id="${escapeHTML(client.id)}">
-                        ↗
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `).join("");
+    tbody.innerHTML = clients.map(client => {
+
+        const name = escapeHTML(client.full_name || "Naam onbekend");
+
+        const company = escapeHTML(client.company_name || "—");
+
+        const id = escapeHTML(client.id);
+
+        return `
+            <tr>
+                <td>
+                    <strong>${name}</strong>
+                </td>
+
+                <td>${company}</td>
+
+                <td>—</td>
+
+                <td>
+                    <span class="status status-active">
+                        Client
+                    </span>
+                </td>
+
+                <td>
+                    <span class="status status-active">
+                        Active
+                    </span>
+                </td>
+
+                <td>
+                    <div class="table-actions">
+                        <button
+                            class="icon-btn"
+                            type="button"
+                            title="Client ID"
+                            data-copy-client="${id}">
+                            ↗
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+    }).join("");
+
 }
 
 
 /* =========================================
-   CLIENT SEARCH & FILTER
+   13. CLIENT SEARCH & FILTER
 ========================================= */
 
-function initializeClientSearch() {
-    const search = document.getElementById("clientSearch");
-    const filter = document.getElementById("clientFilter");
+function initializeSearch() {
 
-    if (search) {
-        search.addEventListener("input", filterClients);
+    const clientSearch = document.getElementById("clientSearch");
+
+    const clientFilter = document.getElementById("clientFilter");
+
+    if (clientSearch) {
+        clientSearch.addEventListener("input", filterClients);
     }
 
-    if (filter) {
-        filter.addEventListener("change", filterClients);
+    if (clientFilter) {
+        clientFilter.addEventListener("change", filterClients);
     }
+
+    // Search fields for other sections.
+    // Their table data will be connected later.
+
+    const searchFields = [
+        "projectSearch",
+        "messageSearch",
+        "fileSearch"
+    ];
+
+    searchFields.forEach(id => {
+
+        const field = document.getElementById(id);
+
+        if (field) {
+            field.addEventListener("input", () => {
+                filterVisibleTable(id);
+            });
+        }
+
+    });
+
+    // Client ID copy button
+    document.addEventListener("click", event => {
+
+        const button = event.target.closest("[data-copy-client]");
+
+        if (!button) return;
+
+        const clientId = button.dataset.copyClient;
+
+        copyToClipboard(clientId);
+
+    });
+
 }
 
 
 function filterClients() {
-    const searchValue =
-        document.getElementById("clientSearch")?.value.toLowerCase() || "";
+
+    const searchValue = (
+        document.getElementById("clientSearch")?.value || ""
+    ).toLowerCase();
 
     const filterValue =
         document.getElementById("clientFilter")?.value || "";
 
     let filtered = allClients.filter(client => {
+
         const name = (client.full_name || "").toLowerCase();
+
         const company = (client.company_name || "").toLowerCase();
 
         return name.includes(searchValue) ||
             company.includes(searchValue);
+
     });
 
     if (filterValue && filterValue !== "all") {
-        filtered = filtered.filter(client =>
-            client.role === filterValue
-        );
+
+        filtered = filtered.filter(client => {
+            return client.role === filterValue;
+        });
+
     }
 
     renderClients(filtered);
+
+}
+
+
+function filterVisibleTable(inputId) {
+
+    const input = document.getElementById(inputId);
+
+    if (!input) return;
+
+    const tableIds = {
+        projectSearch: "projectsTable",
+        messageSearch: "messagesTable",
+        fileSearch: "filesTable"
+    };
+
+    const table = document.getElementById(tableIds[inputId]);
+
+    if (!table) return;
+
+    const search = input.value.toLowerCase();
+
+    table.querySelectorAll("tbody tr").forEach(row => {
+
+        row.style.display = row.textContent.toLowerCase().includes(search)
+            ? ""
+            : "none";
+
+    });
+
 }
 
 
 /* =========================================
-   HELPERS
+   14. SETTINGS
+========================================= */
+
+function initializeSettings() {
+
+    const saveButton = document.getElementById("saveSettings");
+
+    if (!saveButton) return;
+
+    saveButton.addEventListener("click", saveSettings);
+
+    loadSettings();
+
+}
+
+
+function loadSettings() {
+
+    if (!currentProfile) return;
+
+    const nameInput = document.getElementById("settingsName");
+
+    const emailInput = document.getElementById("settingsEmail");
+
+    const roleInput = document.getElementById("settingsRole");
+
+    if (nameInput) {
+        nameInput.value = currentProfile.full_name || "";
+    }
+
+    if (emailInput) {
+        emailInput.value = currentUser?.email || "";
+    }
+
+    if (roleInput) {
+        roleInput.value = currentProfile.role || "";
+    }
+
+}
+
+
+async function saveSettings() {
+
+    if (!currentUser || !currentProfile) return;
+
+    const nameInput = document.getElementById("settingsName");
+
+    if (!nameInput) return;
+
+    const fullName = nameInput.value.trim();
+
+    if (!fullName) {
+        showToast("Vul een naam in.");
+        return;
+    }
+
+    const saveButton = document.getElementById("saveSettings");
+
+    saveButton.disabled = true;
+
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .update({
+            full_name: fullName
+        })
+        .eq("id", currentUser.id)
+        .select("id, full_name, company_name, role")
+        .single();
+
+    if (error) {
+
+        console.error("Settings error:", error);
+
+        showToast("Instellingen konden niet worden opgeslagen.");
+
+        saveButton.disabled = false;
+
+        return;
+    }
+
+    currentProfile = data;
+
+    updateAdminProfile();
+
+    showToast("Instellingen opgeslagen.");
+
+    saveButton.disabled = false;
+
+}
+
+
+/* =========================================
+   15. TABLE HELPERS
+========================================= */
+
+function showTableMessage(table, message) {
+
+    const tbody = table.querySelector("tbody");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="6">
+                <div class="empty-state">
+                    <h3>${escapeHTML(message)}</h3>
+                </div>
+            </td>
+        </tr>
+    `;
+
+}
+
+
+/* =========================================
+   16. TOAST NOTIFICATIONS
+========================================= */
+
+function showToast(message) {
+
+    const container = document.getElementById("toastContainer");
+
+    if (!container) {
+        console.log(message);
+        return;
+    }
+
+    const toast = document.createElement("div");
+
+    toast.className = "toast";
+
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(5px)";
+
+        setTimeout(() => {
+            toast.remove();
+        }, 250);
+
+    }, 3000);
+
+}
+
+
+/* =========================================
+   17. CLIPBOARD
+========================================= */
+
+async function copyToClipboard(text) {
+
+    try {
+
+        await navigator.clipboard.writeText(text);
+
+        showToast("Client ID gekopieerd.");
+
+    } catch (error) {
+
+        console.error("Clipboard error:", error);
+
+        showToast("Kopiëren is niet gelukt.");
+
+    }
+
+}
+
+
+/* =========================================
+   18. HTML SECURITY HELPER
 ========================================= */
 
 function escapeHTML(value) {
+
     return String(value).replace(/[&<>"']/g, character => ({
         "&": "&amp;",
         "<": "&lt;",
@@ -452,23 +902,5 @@ function escapeHTML(value) {
         '"': "&quot;",
         "'": "&#039;"
     })[character]);
-}
 
-
-function showTableMessage(table, message) {
-    const tbody = table.tagName === "TBODY"
-        ? table
-        : table.querySelector("tbody");
-
-    if (!tbody) return;
-
-    tbody.innerHTML = `
-        <tr>
-            <td colspan="5">
-                <div class="empty-state">
-                    <h3>${escapeHTML(message)}</h3>
-                </div>
-            </td>
-        </tr>
-    `;
 }
