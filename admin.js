@@ -43,12 +43,13 @@ const pageNames = {
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-    initializeNavigation();
-    initializeModals();
-    initializeMobileMenu();
-    initializeButtons();
-    initializeSearch();
-    initializeSettings();
+initializeNavigation();
+initializeModals();
+initializeMobileMenu();
+initializeButtons();
+initializeSearch();
+initializeClientCreation();
+initializeSettings();
 
     await checkAdminAccess();
 
