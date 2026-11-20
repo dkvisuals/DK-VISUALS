@@ -1,0 +1,492 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0b0c">
+    <title>Client Portal — DK VISUALS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="clientportal.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+<div class="portal">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <a href="index.html" class="brand">
+            <span class="brand-main">DK.</span>
+            <span class="brand-sub">VISUALS</span>
+        </a>
+
+        <div class="sidebar-label">WORKSPACE</div>
+
+        <nav class="navigation">
+            <a href="#" class="nav-link active" data-page="overview">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Overview</span>
+            </a>
+
+            <a href="#" class="nav-link" data-page="projects">
+                <i data-lucide="folder"></i>
+                <span>My Projects</span>
+                <span class="nav-count">02</span>
+            </a>
+
+            <a href="#" class="nav-link" data-page="files">
+                <i data-lucide="files"></i>
+                <span>Files</span>
+            </a>
+
+            <a href="#" class="nav-link" data-page="messages">
+                <i data-lucide="message-circle"></i>
+                <span>Messages</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-label second-label">MANAGEMENT</div>
+
+        <nav class="navigation">
+            <a href="#" class="nav-link" data-page="invoices">
+                <i data-lucide="receipt"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="#" class="nav-link" data-page="settings">
+                <i data-lucide="settings-2"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="support-card">
+                <div class="support-icon">
+                    <i data-lucide="headset"></i>
+                </div>
+                <div>
+                    <strong>Need assistance?</strong>
+                    <p>We're here to help.</p>
+                </div>
+                <a href="mailto:devranhasankurt@gmail.com">
+                    <i data-lucide="arrow-up-right"></i>
+                </a>
+            </div>
+
+            <a href="index.html" class="back-website">
+                <i data-lucide="arrow-left"></i>
+                Back to website
+            </a>
+        </div>
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="breadcrumb">
+                <span>Workspace</span>
+                <i data-lucide="chevron-right"></i>
+                <strong id="breadcrumbPage">Overview</strong>
+            </div>
+
+            <div class="topbar-right">
+                <button class="icon-button" aria-label="Notifications">
+                    <i data-lucide="bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="topbar-divider"></div>
+
+                <button class="profile-button" data-page="settings">
+                    <div class="avatar">JD</div>
+                    <div class="profile-info">
+                        <strong>John Doe</strong>
+                        <span>Client account</span>
+                    </div>
+                    <i data-lucide="chevron-down"></i>
+                </button>
+            </div>
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+        <div class="content">
+
+            <!-- OVERVIEW -->
+            <section class="page active" id="overview">
+
+                <div class="welcome-section">
+                    <div>
+                        <div class="eyebrow">
+                            <span class="eyebrow-line"></span>
+                            CLIENT WORKSPACE
+                        </div>
+                        <h1>Good morning, <span>John.</span></h1>
+                        <p>Here's what's happening with your projects.</p>
+                    </div>
+
+                    <div class="date-display">
+                        <i data-lucide="calendar-days"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+
+
+                <!-- PROJECT HERO -->
+                <div class="project-hero">
+                    <div class="hero-content">
+                        <div class="hero-top">
+                            <span class="hero-label">CURRENT PROJECT</span>
+                            <span class="status-pill">
+                                <span></span> In progress
+                            </span>
+                        </div>
+
+                        <div class="hero-title">
+                            <span>01 / WEBSITE DEVELOPMENT</span>
+                            <h2>Your digital presence,<br>taking shape.</h2>
+                            <p>Your website is currently being developed. Follow the progress and stay updated here.</p>
+                        </div>
+
+                        <div class="hero-progress">
+                            <div class="progress-heading">
+                                <span>Project progress</span>
+                                <strong>65%</strong>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width:65%"></div>
+                            </div>
+                        </div>
+
+                        <button class="hero-button" data-page="projects">
+                            View project details
+                            <i data-lucide="arrow-up-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="hero-decoration">
+                        <div class="decoration-circle circle-one"></div>
+                        <div class="decoration-circle circle-two"></div>
+                        <div class="decoration-center">DK.</div>
+                        <span class="decoration-caption">DESIGNED WITH INTENTION.</span>
+                    </div>
+                </div>
+
+
+                <!-- STATS -->
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Active projects</span>
+                            <i data-lucide="folder-open"></i>
+                        </div>
+                        <div class="stat-value">01</div>
+                        <div class="stat-description">Currently in development</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Pending feedback</span>
+                            <i data-lucide="message-square"></i>
+                        </div>
+                        <div class="stat-value">02</div>
+                        <div class="stat-description">Items awaiting your review</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-top">
+                            <span>Open invoices</span>
+                            <i data-lucide="receipt"></i>
+                        </div>
+                        <div class="stat-value">01</div>
+                        <div class="stat-description">Awaiting payment</div>
+                    </div>
+                </div>
+
+
+                <!-- LOWER GRID -->
+                <div class="dashboard-grid">
+
+                    <div class="panel project-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <span class="panel-eyebrow">YOUR WORK</span>
+                                <h3>Recent projects</h3>
+                            </div>
+                            <button class="text-button" data-page="projects">
+                                View all <i data-lucide="arrow-up-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="project-list-item">
+                            <div class="project-thumbnail">
+                                <i data-lucide="monitor"></i>
+                            </div>
+                            <div class="project-details">
+                                <strong>Website Development</strong>
+                                <span>Website design & development</span>
+                                <div class="mini-progress">
+                                    <div style="width:65%"></div>
+                                </div>
+                            </div>
+                            <span class="mini-status">In progress</span>
+                        </div>
+
+                        <div class="project-list-item">
+                            <div class="project-thumbnail thumbnail-alt">
+                                <i data-lucide="palette"></i>
+                            </div>
+                            <div class="project-details">
+                                <strong>Brand Identity</strong>
+                                <span>Visual identity & assets</span>
+                                <div class="mini-progress">
+                                    <div style="width:100%"></div>
+                                </div>
+                            </div>
+                            <span class="mini-status completed">Completed</span>
+                        </div>
+                    </div>
+
+
+                    <div class="panel activity-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <span class="panel-eyebrow">LATEST UPDATES</span>
+                                <h3>Recent activity</h3>
+                            </div>
+                            <i data-lucide="activity" class="heading-icon"></i>
+                        </div>
+
+                        <div class="activity-list">
+
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i data-lucide="check"></i>
+                                </div>
+                                <div>
+                                    <strong>Homepage design approved</strong>
+                                    <p>Project milestone completed</p>
+                                    <span>Today · 10:30 AM</span>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i data-lucide="upload"></i>
+                                </div>
+                                <div>
+                                    <strong>New files uploaded</strong>
+                                    <p>Design concepts added</p>
+                                    <span>Yesterday · 03:15 PM</span>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i data-lucide="message-circle"></i>
+                                </div>
+                                <div>
+                                    <strong>New project update</strong>
+                                    <p>Development is progressing</p>
+                                    <span>18 November · 11:00 AM</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- BOTTOM BANNER -->
+                <div class="bottom-banner">
+                    <div>
+                        <span>HAVE SOMETHING IN MIND?</span>
+                        <h3>Let's make something great.</h3>
+                        <p>Have a question or a new idea? Get in touch with us.</p>
+                    </div>
+                    <a href="mailto:devranhasankurt@gmail.com" class="banner-button">
+                        Get in touch <i data-lucide="arrow-up-right"></i>
+                    </a>
+                </div>
+
+            </section>
+
+
+            <!-- PROJECTS -->
+            <section class="page" id="projects">
+                <div class="page-heading">
+                    <div class="eyebrow">YOUR WORKSPACE / 01</div>
+                    <h1>My <span>projects.</span></h1>
+                    <p>Everything we're creating together, in one place.</p>
+                </div>
+
+                <div class="panel full-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-eyebrow">PROJECT OVERVIEW</span>
+                            <h3>All projects</h3>
+                        </div>
+                        <span class="subtle-text">02 projects</span>
+                    </div>
+
+                    <div class="project-list-item">
+                        <div class="project-thumbnail"><i data-lucide="monitor"></i></div>
+                        <div class="project-details">
+                            <strong>Website Development</strong>
+                            <span>Website design & development</span>
+                            <div class="mini-progress"><div style="width:65%"></div></div>
+                        </div>
+                        <span class="mini-status">In progress</span>
+                    </div>
+
+                    <div class="project-list-item">
+                        <div class="project-thumbnail thumbnail-alt"><i data-lucide="palette"></i></div>
+                        <div class="project-details">
+                            <strong>Brand Identity</strong>
+                            <span>Visual identity & assets</span>
+                            <div class="mini-progress"><div style="width:100%"></div></div>
+                        </div>
+                        <span class="mini-status completed">Completed</span>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- FILES -->
+            <section class="page" id="files">
+                <div class="page-heading">
+                    <div class="eyebrow">YOUR WORKSPACE / 02</div>
+                    <h1>Project <span>files.</span></h1>
+                    <p>All your documents, assets and deliverables.</p>
+                </div>
+
+                <div class="panel full-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-eyebrow">DOCUMENT LIBRARY</span>
+                            <h3>Shared files</h3>
+                        </div>
+                        <i data-lucide="folder-open" class="heading-icon"></i>
+                    </div>
+
+                    <div class="empty-state">
+                        <div class="empty-icon"><i data-lucide="files"></i></div>
+                        <h3>Your files will appear here.</h3>
+                        <p>Once files are shared with you, you'll find them in this space.</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- MESSAGES -->
+            <section class="page" id="messages">
+                <div class="page-heading">
+                    <div class="eyebrow">YOUR WORKSPACE / 03</div>
+                    <h1>Let's <span>talk.</span></h1>
+                    <p>Keep in touch with DK VISUALS.</p>
+                </div>
+
+                <div class="panel full-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-eyebrow">COMMUNICATION</span>
+                            <h3>Messages</h3>
+                        </div>
+                    </div>
+
+                    <div class="empty-state">
+                        <div class="empty-icon"><i data-lucide="message-circle"></i></div>
+                        <h3>No messages yet.</h3>
+                        <p>When a conversation starts, it will appear here.</p>
+                        <a href="mailto:devranhasankurt@gmail.com" class="primary-button">
+                            Contact DK VISUALS <i data-lucide="arrow-up-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- INVOICES -->
+            <section class="page" id="invoices">
+                <div class="page-heading">
+                    <div class="eyebrow">YOUR WORKSPACE / 04</div>
+                    <h1>Your <span>invoices.</span></h1>
+                    <p>Keep track of your payments and documents.</p>
+                </div>
+
+                <div class="panel full-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-eyebrow">FINANCIAL OVERVIEW</span>
+                            <h3>Invoices</h3>
+                        </div>
+                    </div>
+
+                    <div class="empty-state">
+                        <div class="empty-icon"><i data-lucide="receipt"></i></div>
+                        <h3>No invoices available.</h3>
+                        <p>Your invoices and payment information will appear here.</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- SETTINGS -->
+            <section class="page" id="settings">
+                <div class="page-heading">
+                    <div class="eyebrow">YOUR WORKSPACE / 05</div>
+                    <h1>Account <span>settings.</span></h1>
+                    <p>Manage your personal account information.</p>
+                </div>
+
+                <div class="panel full-panel settings-panel">
+                    <span class="panel-eyebrow">PERSONAL INFORMATION</span>
+                    <h3>Account details</h3>
+
+                    <div class="settings-field">
+                        <label>Full name</label>
+                        <input type="text" value="John Doe" readonly>
+                    </div>
+
+                    <div class="settings-field">
+                        <label>Email address</label>
+                        <input type="email" value="john@example.com" readonly>
+                    </div>
+
+                    <div class="settings-field">
+                        <label>Account type</label>
+                        <input type="text" value="Client account" readonly>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <span>© 2026 DK VISUALS. ALL RIGHTS RESERVED.</span>
+                <span>DESIGNED & DEVELOPED BY DK VISUALS</span>
+            </footer>
+
+        </div>
+    </main>
+</div>
+
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="clientportal.js"></script>
+</body>
+</html>
