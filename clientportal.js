@@ -1,15 +1,21 @@
-
 // =====================================
 // SUPABASE CONNECTION
 // =====================================
 
 const SUPABASE_URL = "https://rajyuhkatjdnnsifaxuh.supabase.co";
+
 const SUPABASE_KEY = "sb_publishable_DHz9wzifauyVzhNyyBMeWw_aJfdPGab";
 
 const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
+
+console.log("Supabase connected!");
+
+
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
