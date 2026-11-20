@@ -265,6 +265,30 @@ async function showPortal() {
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("portalContent").style.display = "block";
 
+// Get user information
+const fullName = profile.full_name?.trim() || user.email.split("@")[0];
+const firstName = fullName.split(" ")[0];
+
+const roleLabel = profile.role === "admin"
+    ? "DK VISUALS Admin"
+    : "Client account";
+
+// Sidebar profile
+document.getElementById("userName").textContent = fullName;
+document.getElementById("userRole").textContent = roleLabel;
+
+// Avatar initials
+document.getElementById("userAvatar").textContent =
+    fullName.split(" ").map(part => part[0]).join("").toUpperCase();
+
+// Welcome heading
+document.getElementById("welcomeName").textContent = firstName + ".";
+
+// Settings
+document.getElementById("settingsName").value = fullName;
+document.getElementById("settingsEmail").value = user.email;
+document.getElementById("settingsRole").value = roleLabel;
+
     console.log("Welcome:", profile.full_name);
     console.log("Account role:", profile.role);
 
