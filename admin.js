@@ -720,6 +720,107 @@ function filterVisibleTable(inputId) {
    14. SETTINGS
 ========================================= */
 
+/* =========================================
+   CREATE CLIENT ACCOUNT
+========================================= */
+
+function initializeClientCreation() {
+
+    const form = document.getElementById("clientForm");
+
+    if (!form) return;
+
+    const result = document.getElementById("clientResult");
+    const passwordInput = document.getElementById("generatedPassword");
+    const createButton = document.getElementById("createClientBtn");
+    const copyButton = document.getElementById("copyPasswordBtn");
+
+    form.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        const formData = new FormData(form);
+
+        const clientData = {
+            full_name: formData.get("full_name").trim(),
+            company_name: formData.get("company_name").trim(),
+            email: formData.get("email").trim()
+        };
+
+        createButton.disabled = true;
+        createButton.textContent = "Creating account...";
+
+        result.style.display = "none";
+
+        try {
+
+            const { data, error } = await supabaseClient.functions.invoke(
+                "create-client",
+                {
+                    body: clientData
+                }
+            );
+
+            if (error) {
+                throw new Error(error.message || "Could not create client.");
+            }
+
+            if (!data || !data.success) {
+                throw new Error(data?.error || "Account creation failed.");
+            }
+
+            passwordInput.value = data.temporary_password;
+
+            result.style.display = "block";
+
+            createButton.textContent = "Client created";
+            
+            showToast("Client account successfully created.");
+
+            await loadClients();
+
+            form.querySelector('[name="full_name"]').value = "";
+            form.querySelector('[name="company_name"]').value = "";
+            form.querySelector('[name="email"]').value = "";
+
+        } catch (error) {
+
+            console.error("Client creation error:", error);
+
+            showToast(error.message || "Something went wrong.");
+
+            createButton.textContent = "Create client account";
+
+        } finally {
+
+            createButton.disabled = false;
+
+        }
+
+    });
+
+    if (copyButton) {
+
+        copyButton.addEventListener("click", async () => {
+
+            try {
+
+                await navigator.clipboard.writeText(passwordInput.value);
+
+                showToast("Temporary password copied.");
+
+            } catch (error) {
+
+                showToast("Could not copy password.");
+
+            }
+
+        });
+
+    }
+
+}
+
 function initializeSettings() {
 
     const saveButton = document.getElementById("saveSettings");
