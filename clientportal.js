@@ -128,3 +128,70 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+
+
+
+// =====================================
+// DK VISUALS AUTHENTICATION
+// =====================================
+
+// Login
+async function loginUser(email, password) {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+
+    if (error) {
+        alert("Login failed: " + error.message);
+        return;
+    }
+
+    console.log("Successfully logged in:", data.user.email);
+
+    await loadUserProfile();
+}
+
+// Logout
+async function logoutUser() {
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    window.location.reload();
+}
+
+// Load logged-in user's profile
+async function loadUserProfile() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+        console.log("No user logged in.");
+        return;
+    }
+
+    const { data: profile, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+    if (error) {
+        console.error("Profile error:", error.message);
+        return;
+    }
+
+    console.log("Logged-in profile:", profile);
+
+    if (profile.role === "admin") {
+        console.log("Welcome, DK VISUALS Admin!");
+    } else {
+        console.log("Welcome, Client!");
+    }
+}
+
+
+
