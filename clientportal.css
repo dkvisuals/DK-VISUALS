@@ -1107,3 +1107,159 @@ h1 span {
         transition-duration: .01ms !important;
     }
 }
+
+
+
+
+
+
+
+
+
+
+/* =====================================
+   DK VISUALS LOGIN SCREEN
+===================================== */
+
+.login-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #0b0b0c;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 44px;
+    background: #111113;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+}
+
+.login-logo {
+    margin-bottom: 55px;
+    color: #fff;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.login-logo span {
+    margin-left: 5px;
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.login-label {
+    margin-bottom: 14px;
+    color: #888;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.login-card h1 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 38px;
+    font-weight: 500;
+    letter-spacing: -1.8px;
+}
+
+.login-card h1 span {
+    color: #888;
+}
+
+.login-description {
+    margin-bottom: 35px;
+    color: #858585;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+#loginForm {
+    display: flex;
+    flex-direction: column;
+}
+
+#loginForm label {
+    margin-bottom: 9px;
+    color: #ccc;
+    font-size: 12px;
+}
+
+#loginForm input {
+    width: 100%;
+    margin-bottom: 22px;
+    padding: 15px;
+    color: #fff;
+    background: #171719;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 7px;
+    outline: none;
+    font-size: 13px;
+}
+
+#loginForm input:focus {
+    border-color: #888;
+}
+
+#loginForm input::placeholder {
+    color: #666;
+}
+
+#loginForm button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding: 16px 18px;
+    color: #0b0b0c;
+    background: #f1f1ef;
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+#loginForm button:hover {
+    background: #d5d5d2;
+}
+
+#loginForm button span {
+    font-size: 18px;
+}
+
+#loginError {
+    color: #e58b8b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.login-footer {
+    margin-top: 38px;
+    padding-top: 20px;
+    color: #666;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 30px 24px;
+    }
+
+    .login-card h1 {
+        font-size: 33px;
+    }
+}
+
