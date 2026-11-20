@@ -42,7 +42,6 @@ const pageNames = {
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
-initializeProjectManagement();
 initializeNavigation();
 initializeModals();
 initializeMobileMenu();
@@ -1246,4 +1245,224 @@ function escapeHTML(value) {
 
 window.updateProjectStatus = updateProjectStatus;
 window.updateProjectProgress = updateProjectProgress;
+window.deleteProject = deleteProject;
+
+
+
+
+
+
+function initializeProjectManagement() {
+    const form = document.getElementById("projectForm");
+
+    if (!form) return;
+
+    const openButton = document.querySelector(
+        '[data-open-modal="projectModal"]'
+    );
+
+    if (openButton) {
+        openButton.addEventListener("click", loadProjectClients);
+    }
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+
+        const project = {
+            client_id: formData.get("client_id"),
+            name: formData.get("project_name").trim(),
+            description: formData.get("description").trim(),
+            start_date: formData.get("start_date") || null,
+            due_date: formData.get("deadline") || null,
+            status: formData.get("status") || "pending",
+            progress: 0
+        };
+
+        const submitButton = form.querySelector(
+            'button[type="submit"]'
+        );
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Creating project...";
+
+        const { error } = await supabaseClient
+            .from("projects")
+            .insert(project);
+
+        if (error) {
+            console.error("Project creation error:", error);
+            showToast(error.message);
+            submitButton.disabled = false;
+            submitButton.textContent = "Create project";
+            return;
+        }
+
+        showToast("Project successfully created.");
+
+        form.reset();
+
+        const modal = document.getElementById("projectModal");
+        if (modal) modal.classList.remove("active");
+
+        submitButton.disabled = false;
+        submitButton.textContent = "Create project";
+
+        await loadProjects();
+    });
+
+    loadProjects();
+}
+
+async function loadProjectClients() {
+    const select = document.getElementById("projectClientSelect");
+
+    if (!select) return;
+
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("id, full_name, company_name")
+        .eq("role", "client")
+        .order("full_name");
+
+    if (error) {
+        console.error(error);
+        showToast("Could not load clients.");
+        return;
+    }
+
+    select.innerHTML = '<option value="">Select a client</option>';
+
+    (data || []).forEach(client => {
+        const option = document.createElement("option");
+
+        option.value = client.id;
+        option.textContent =
+            client.company_name || client.full_name || "Unnamed client";
+
+        select.appendChild(option);
+    });
+}
+
+async function loadProjects() {
+    const table = document.getElementById("projectsTable");
+
+    if (!table) return;
+
+    const { data, error } = await supabaseClient
+        .from("projects")
+        .select(`
+            id,
+            name,
+            description,
+            status,
+            progress,
+            start_date,
+            due_date,
+            client_id,
+            profiles (
+                full_name,
+                company_name
+            )
+        `)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error("Loading projects:", error);
+        table.innerHTML = `
+            <tr><td colspan="6">Could not load projects.</td></tr>
+        `;
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        table.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-state">
+                    No projects available yet.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    table.innerHTML = data.map(project => {
+        const client = project.profiles || {};
+
+        const clientName =
+            client.company_name || client.full_name || "Unknown client";
+
+        return `
+            <tr>
+                <td><strong>${escapeHTML(project.name)}</strong></td>
+                <td>${escapeHTML(clientName)}</td>
+                <td>${project.start_date || "—"}</td>
+                <td>${project.due_date || "—"}</td>
+                <td>
+                    <select onchange="updateProjectStatus('${project.id}', this.value)">
+                        ${["pending", "in-progress", "review", "completed"].map(status => `
+                            <option value="${status}" ${project.status === status ? "selected" : ""}>
+                                ${status.replace("-", " ")}
+                            </option>
+                        `).join("")}
+                    </select>
+                </td>
+                <td>
+                    <button
+                        class="button-secondary"
+                        onclick="deleteProject('${project.id}')">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+async function updateProjectStatus(id, status) {
+    const { error } = await supabaseClient
+        .from("projects")
+        .update({ status })
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        showToast(error.message);
+        return;
+    }
+
+    showToast("Project status updated.");
+}
+
+async function deleteProject(id) {
+    if (!confirm("Are you sure you want to delete this project?")) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from("projects")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        showToast(error.message);
+        return;
+    }
+
+    showToast("Project deleted.");
+    await loadProjects();
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    })[character]);
+}
+
+window.updateProjectStatus = updateProjectStatus;
 window.deleteProject = deleteProject;
