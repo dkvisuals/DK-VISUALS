@@ -762,9 +762,23 @@ function initializeClientCreation() {
                 }
             );
 
-            if (error) {
-                throw new Error(error.message || "Could not create client.");
-            }
+if (error) {
+    let details = {};
+
+    try {
+        details = await error.context.json();
+    } catch (e) {
+        console.error("Could not read server response:", e);
+    }
+
+    console.error("Edge Function response:", details);
+
+    throw new Error(
+        details.error ||
+        details.message ||
+        error.message
+    );
+}
 
             if (!data || !data.success) {
                 throw new Error(data?.error || "Account creation failed.");
