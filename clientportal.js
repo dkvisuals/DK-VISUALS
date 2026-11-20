@@ -223,7 +223,7 @@ if (loginForm) {
         });
 
         if (error) {
-            errorMessage.textContent = "Login failed. Check your email and password.";
+            errorMessage.textContent = error.message;
             loginButton.disabled = false;
             loginButton.innerHTML = 'Sign in <span>→</span>';
             console.error("Login error:", error.message);
