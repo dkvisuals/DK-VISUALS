@@ -195,3 +195,99 @@ async function loadUserProfile() {
 
 
 
+
+
+
+// =====================================
+// DK VISUALS LOGIN
+// =====================================
+
+const loginForm = document.getElementById("loginForm");
+
+if (loginForm) {
+    loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById("loginEmail").value.trim();
+        const password = document.getElementById("loginPassword").value;
+        const errorMessage = document.getElementById("loginError");
+        const loginButton = document.getElementById("loginButton");
+
+        errorMessage.textContent = "";
+        loginButton.disabled = true;
+        loginButton.textContent = "Signing in...";
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            errorMessage.textContent = "Login failed. Check your email and password.";
+            loginButton.disabled = false;
+            loginButton.innerHTML = 'Sign in <span>→</span>';
+            console.error("Login error:", error.message);
+            return;
+        }
+
+        console.log("Login successful:", data.user.email);
+
+        await showPortal();
+    });
+}
+
+
+// =====================================
+// SHOW PORTAL AFTER LOGIN
+// =====================================
+
+async function showPortal() {
+    const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        console.error("Could not retrieve user.");
+        return;
+    }
+
+    const { data: profile, error: profileError } = await supabaseClient
+        .from("profiles")
+        .select("full_name, company_name, role")
+        .eq("id", user.id)
+        .single();
+
+    if (profileError) {
+        console.error("Profile error:", profileError.message);
+        alert("Could not load your profile.");
+        return;
+    }
+
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("portalContent").style.display = "block";
+
+    console.log("Welcome:", profile.full_name);
+    console.log("Account role:", profile.role);
+
+    if (profile.role === "admin") {
+        console.log("DK VISUALS admin account detected.");
+    } else {
+        console.log("Client account detected.");
+    }
+}
+
+
+// =====================================
+// CHECK EXISTING SESSION
+// =====================================
+
+async function checkLoginSession() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session) {
+        await showPortal();
+    }
+}
+
+checkLoginSession();
+
+
