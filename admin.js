@@ -42,6 +42,7 @@ const pageNames = {
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
+   initializeProjectManagement();
 initializeNavigation();
 initializeModals();
 initializeMobileMenu();
