@@ -11,6 +11,16 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
+supabaseClient.auth.getSession()
+    .then(({ data, error }) => {
+        if (error) {
+            console.error("Supabase error:", error.message);
+        } else {
+            console.log("Supabase connection successful!");
+            console.log("Current session:", data.session);
+        }
+    });
+
 console.log("Supabase connected!");
 
 
